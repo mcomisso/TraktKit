@@ -58,7 +58,7 @@ class TraktCommentBody: TraktSingleObjectBody<SyncId> {
 /// ID used to sync with Trakt.
 public struct SyncId: Codable, Hashable {
     /// Trakt id of the movie / show / season / episode
-    public let trakt: Int
+    public let trakt: Int?
     public let tmdb: Int?
 
     enum CodingKeys: String, CodingKey {
@@ -73,8 +73,8 @@ public struct SyncId: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         var nested = container.nestedContainer(keyedBy: IDCodingKeys.self, forKey: .ids)
-        try nested.encode(trakt, forKey: .trakt)
-        try nested.encode(tmdb, forKey: .tmdb)
+        try nested.encodeIfPresent(trakt, forKey: .trakt)
+        try nested.encodeIfPresent(tmdb, forKey: .tmdb)
     }
     
     public init(from decoder: Decoder) throws {
@@ -84,7 +84,7 @@ public struct SyncId: Codable, Hashable {
         self.tmdb = try nested.decodeIfPresent(Int.self, forKey: .tmdb)
     }
     
-    public init(trakt: Int, tmdb: Int) {
+    public init(trakt: Int?, tmdb: Int?) {
         self.trakt = trakt
         self.tmdb = tmdb
     }
